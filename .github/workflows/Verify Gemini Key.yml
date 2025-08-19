@@ -328,6 +328,9 @@ jobs:
           else if ${{ github.event.inputs.model }} == 'pro'; then
             echo "使用 Pro 模型"
             pip install httpx aiofiles tqdm "tomli-w" "tomli"
+          else
+            echo "未知模型类型，请检查输入。"
+            exit 1
           fi
 
 
