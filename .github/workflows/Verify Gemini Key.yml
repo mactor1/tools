@@ -1,0 +1,47 @@
+name: Verify Gemini Key
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 迁出代码
+        uses: actions/checkout@v3
+
+      - name: 准备环境
+        run: |
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
+          unzip -P ${{ secrets.ZIPASS }} key.zip
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker
+          chmod a+x checker
+
+      - name: 开始验证
+        run: |
+          ./checker -i gemini.txt
+          TS=$(date +%s)
+          echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y%m%d%H%M%S") > time.txt
+          echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y-%m-%d %H:%M:%S") > new_time.txt
+          mv freekey.txt freekey-$(cat time.txt).txt
+          mv paidkey.txt paidkey-$(cat time.txt).txt
+
+      - name: 发送结果
+        run: |
+          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMediaGroup" \
+            -F chat_id="${{ secrets.TELEGRAM_TO }}" \
+            -F media='[
+                {
+                    "type": "document",
+                    "media": "attach://file1"
+                },
+                {
+                    "type": "document",
+                    "media": "attach://file2",
+                    "caption": "🚀 Gemini密钥验证完成 '"$(cat new_time.txt)"'",
+                    "parse_mode": "HTML"
+                }
+            ]' \
+            -F file1=@"freekey-$(cat time.txt).txt" \
+            -F file2=@"paidkey-$(cat time.txt).txt"
+
