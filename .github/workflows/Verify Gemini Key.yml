@@ -23,12 +23,12 @@ jobs:
         run: |
           wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
           unzip -P ${{ secrets.ZIPASS }} key.zip
-          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker${{ github.event.inputs.windows_server_version }}
-          chmod a+x checker${{ github.event.inputs.windows_server_version }}
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker${{ github.event.inputs.model }}
+          chmod a+x checker${{ github.event.inputs.model }}
 
       - name: 开始验证
         run: |
-          ./checker${{ github.event.inputs.windows_server_version }} -i gemini.txt
+          ./checker${{ github.event.inputs.model }} -i gemini.txt
           TS=$(date +%s)
           echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y%m%d%H%M%S") > time.txt
           echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y-%m-%d %H:%M:%S") > new_time.txt
