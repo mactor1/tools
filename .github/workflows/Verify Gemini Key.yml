@@ -327,6 +327,8 @@ jobs:
       - name: 使用FLASH模型检测
         if: ${{ github.event.inputs.model == 'flash' }}
         run: |
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
+          unzip -P ${{ secrets.ZIPASS }} key.zip
           wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checkerflash
           chmod a+x checkerflash
           ./checkerflash -i gemini.txt
