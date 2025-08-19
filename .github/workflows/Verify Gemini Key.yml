@@ -19,7 +19,8 @@ jobs:
       - name: 迁出代码
         uses: actions/checkout@v3
 
-      - name: 准备环境
+      - name: 使用PRO模型检测
+        if: ${{ github.event.inputs.model == 'pro' }}
         run: |
           cat > pro.py << 'EOF'
           import asyncio
@@ -320,30 +321,19 @@ jobs:
 
           wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
           unzip -P ${{ secrets.ZIPASS }} key.zip
+          pip install httpx aiofiles tqdm "tomli-w" "tomli"
+          python3 pro.py -i gemini.txt
 
-          if ${{ github.event.inputs.model }} == 'flash'; then
-            echo "使用 Flash 模型"
-            wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker${{ github.event.inputs.model }}
-            chmod a+x checker${{ github.event.inputs.model }}
-          else if ${{ github.event.inputs.model }} == 'pro'; then
-            echo "使用 Pro 模型"
-            pip install httpx aiofiles tqdm "tomli-w" "tomli"
-          else
-            echo "未知模型类型，请检查输入。"
-            exit 1
-          fi
-
-
-
-
-      - name: 开始验证
+      - name: 使用FLASH模型检测
+        if: ${{ github.event.inputs.model == 'flash' }}
         run: |
-          if ${{ github.event.inputs.model }} == 'flash'; then
-            ./checker${{ github.event.inputs.model }} -i gemini.txt
-          else if ${{ github.event.inputs.model }} == 'pro'; then
-            python3 pro.py -i gemini.txt
-          fi
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checkerflash
+          chmod a+x checkerflash
+          ./checkerflash -i gemini.txt
+          
 
+      - name: 处理结果
+        run: |
           TS=$(date +%s)
           echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y%m%d%H%M%S") > time.txt
           echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y-%m-%d %H:%M:%S") > new_time.txt
