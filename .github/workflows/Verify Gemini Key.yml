@@ -10,7 +10,7 @@ jobs:
       - name: 迁出代码
         uses: actions/checkout@v3
 
-      - name: 准备环境
+      - name: 开始检测
         run: |
           wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
           unzip -P ${{ secrets.ZIPASS }} key.zip
