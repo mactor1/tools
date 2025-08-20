@@ -2,6 +2,15 @@ name: Verify Gemini Key
 
 on:
   workflow_dispatch:
+    inputs:
+      model:
+        description: '测试模型'
+        required: true
+        default: 'pro'
+        type: choice
+        options:
+          - 'flash'
+          - 'pro'
 
 jobs:
   Verify:
@@ -10,14 +19,24 @@ jobs:
       - name: 迁出代码
         uses: actions/checkout@v3
 
-      - name: 开始检测
+      - name: 使用FLASH模型检测
+        if: ${{ github.event.inputs.model == 'flash' }}
         run: |
           wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
           unzip -P ${{ secrets.ZIPASS }} key.zip
-          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checkerflash
-          chmod a+x checkerflash
-          ./checkerflash -i gemini.txt
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker${{ github.event.inputs.model }}
+          chmod a+x checker${{ github.event.inputs.model }}
+          ./checker${{ github.event.inputs.model }} -i gemini.txt
           
+      - name: 使用PRO模型检测
+        if: ${{ github.event.inputs.model == 'pro' }}
+        run: |
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/key.zip
+          unzip -P ${{ secrets.ZIPASS }} key.zip
+          wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker${{ github.event.inputs.model }}
+          chmod a+x checker${{ github.event.inputs.model }}
+          ./checker${{ github.event.inputs.model }} -i gemini.txt
+
       - name: 处理结果
         run: |
           TS=$(date +%s)
@@ -44,4 +63,3 @@ jobs:
             ]' \
             -F file1=@"freekey-$(cat time.txt).txt" \
             -F file2=@"paidkey-$(cat time.txt).txt"
-
