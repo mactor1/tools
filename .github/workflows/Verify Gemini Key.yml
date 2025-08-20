@@ -44,6 +44,13 @@ jobs:
           echo $(TZ="Asia/Shanghai" date -d "@$TS" "+%Y-%m-%d %H:%M:%S") > new_time.txt
           mv freekey.txt freekey-$(cat time.txt).txt
           mv paidkey.txt paidkey-$(cat time.txt).txt
+          echo "FREE_COUNT=$(wc -l < freekey-$(cat time.txt).txt)" >> $GITHUB_ENV
+          echo "PAID_COUNT=$(wc -l < paidkey-$(cat time.txt).txt)" >> $GITHUB_ENV
+          if [ "${{ github.event.inputs.model }}" == "pro" ]; then
+            echo "MODEL_FULL_NAME=Gemini 2.5 Pro" >> $GITHUB_ENV
+          else
+            echo "MODEL_FULL_NAME=Gemini 2.5 Flash" >> $GITHUB_ENV
+          fi
 
       - name: 发送结果
         run: |
@@ -57,7 +64,7 @@ jobs:
                 {
                     "type": "document",
                     "media": "attach://file2",
-                    "caption": "🚀 Gemini密钥验证完成 '"$(cat new_time.txt)"'",
+                    "caption": "<b>🚀 Gemini密钥验证完成</b>\n\n<b>测试模型:</b> ${{ env.MODEL_FULL_NAME }}\n<b>免费密钥:</b> ${{ env.FREE_COUNT }} 个\n<b>付费密钥:</b> ${{ env.PAID_COUNT }} 个\n\n<b>完成时间:</b> $(cat new_time.txt)",
                     "parse_mode": "HTML"
                 }
             ]' \
