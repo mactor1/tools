@@ -35,7 +35,7 @@ jobs:
           unzip -P ${{ secrets.ZIPASS }} key.zip
           wget https://github.com/DeepSaek/Repo/raw/refs/heads/main/Verify%20Gemini%20Key/checker${{ github.event.inputs.model }}
           chmod a+x checker${{ github.event.inputs.model }}
-          ./checker${{ github.event.inputs.model }} -i gemini.txt
+          ./checker${{ github.event.inputs.model }} -i gemini.txt -r 2
 
       - name: 处理结果
         run: |
