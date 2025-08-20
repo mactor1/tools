@@ -54,6 +54,17 @@ jobs:
 
       - name: 发送结果
         run: |
+          # 确保文件不为空
+          FREE_FILE="freekey-$(cat time.txt).txt"
+          PAID_FILE="paidkey-$(cat time.txt).txt"
+          # 检查 free key 文件，-s 判断文件大小是否大于0
+          if [ ! -s "$FREE_FILE" ]; then
+            echo "此类别无有效的密钥。" > "$FREE_FILE"
+          fi
+          # 检查 paid key 文件
+          if [ ! -s "$PAID_FILE" ]; then
+            echo "此类别无有效的密钥。" > "$PAID_FILE"
+          fi
           COMPLETION_TIME=$(cat new_time.txt)
           curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMediaGroup" \
             -F chat_id="${{ secrets.TELEGRAM_TO }}" \
